@@ -1,9 +1,10 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.route.js';
-import cookieParser from 'cookie-parser';
+import userRoutes from './routes/user.route.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ app.use(cookieParser());
 
 // routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // start the server after db is connected
 try {
