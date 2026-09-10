@@ -7,6 +7,10 @@ import authRoutes from './routes/auth.route.js';
 const app = express();
 const port = process.env.PORT || 3000;
 
+// middleware
+app.use(express.json());
+
+// routes
 app.use('/api/auth', authRoutes);
 
 // start the server after db is connected
