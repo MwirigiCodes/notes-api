@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
 import connectDB from './config/db.js';
+import limiter from './utils/rateLimiter.js';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import noteRoutes from './routes/note.route.js';
@@ -13,6 +14,7 @@ const port = process.env.PORT || 3000;
 // middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(limiter);
 
 // routes
 app.use('/api/auth', authRoutes);
