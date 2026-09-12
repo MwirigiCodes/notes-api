@@ -2,7 +2,7 @@ import Note from '../models/Note.js';
 
 export const getNotes = async (req, res) => {
   try {
-    const notes = await Note.find({});
+    const notes = await Note.find({ creator: req.user._id });
     res.status(200).json(notes);
   } catch (error) {
     console.error('Error in getNotes controller: ' + error.message);
