@@ -2,7 +2,7 @@ import Note from '../models/Note.js';
 
 export const getNotes = async (req, res) => {
   try {
-    const notes = await Note.find({ creator: req.user._id });
+    const notes = await Note.find({ creator: req.user.id });
     res.status(200).json(notes);
   } catch (error) {
     console.error('Error in getNotes controller: ' + error.message);
@@ -13,9 +13,11 @@ export const getNotes = async (req, res) => {
 export const getNoteById = async (req, res) => {
   try {
     const { id } = req.params;
-    const note = await Note.findOne({ _id: id });
+    const note = await Note.findOne({
+      $and: [{ _id: id }, { creator: req.user._id }],
+    });
 
-    if (!note) return res.status(400).json({ message: 'Invalid note id' });
+    if (!note) return res.status(404).json({ message: 'Note note found' });
 
     res.status(200).json(note);
   } catch (error) {
@@ -31,7 +33,14 @@ export const createNote = async (req, res) => {
     if (!title || !content)
       return res.status(400).json({ message: 'All fields are required' });
 
-    const note = await Note.create({ title, content });
+    const exists = await Note.findOne({
+      $and: [{ title }, { creator: req.user._id }],
+    });
+
+    if (exists)
+      return res.status(400).json({ message: 'Note with this title exists' });
+
+    const note = await Note.create({ title, content, creator: req.user._id });
     res.status(201).json({ message: 'Note created successfully' });
   } catch (error) {
     console.error('Error in createNote controller: ' + error.message);
@@ -44,18 +53,20 @@ export const updateNote = async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
 
-    const exists = await Note.findOne({ title });
+    const exists = await Note.findOne({
+      $and: [{ title: title }, { creator: req.user._id }],
+    });
 
     if (exists)
       return res.status(400).json({ message: 'Note with this title exists' });
 
     const note = await Note.findOneAndUpdate(
-      { _id: id },
+      { $and: [{ _id: id }, { creator: req.user._id }] },
       { title, content },
       { returnDocument: 'after' },
     );
 
-    if (!note) return res.status(400).json({ message: 'Invalid note id' });
+    if (!note) return res.status(404).json({ message: 'Note not found' });
 
     res.status(200).json({ message: 'Note updated successfully' });
   } catch (error) {
@@ -67,9 +78,11 @@ export const updateNote = async (req, res) => {
 export const deleteNote = async (req, res) => {
   try {
     const { id } = req.params;
-    const note = await Note.findOneAndDelete({ _id: id });
+    const note = await Note.findOneAndDelete({
+      $and: [{ _id: id }, { creator: req.user._id }],
+    });
 
-    if (!note) return res.status(400).json({ message: 'Invalid note id' });
+    if (!note) return res.status(404).json({ message: 'Note not found' });
 
     res.status(200).json({ message: 'Note deleted successfully' });
   } catch (error) {
