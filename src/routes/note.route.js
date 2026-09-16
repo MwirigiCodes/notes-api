@@ -1,6 +1,11 @@
 import express from 'express';
 
 import {
+  addNoteValidation,
+  updateNoteValidation,
+} from '../middleware/validations.js';
+
+import {
   getNotes,
   getNoteById,
   createNote,
@@ -12,8 +17,8 @@ const router = express.Router();
 
 router.get('/', getNotes);
 router.get('/:id', getNoteById);
-router.post('/', createNote);
-router.put('/:id', updateNote);
+router.post('/', addNoteValidation, createNote);
+router.put('/:id', updateNoteValidation, updateNote);
 router.delete('/:id', deleteNote);
 
 export default router;

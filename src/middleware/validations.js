@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator';
+import { query, body, validationResult } from 'express-validator';
 
 const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
 
@@ -56,6 +56,25 @@ export const loginValidation = [
     .withMessage(requiredMessage)
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long'),
+];
+
+export const addNoteValidation = [
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('All fields are required')
+    .escape(),
+  body('content')
+    .trim()
+    .notEmpty()
+    .withMessage('All fields are required')
+    .escape(),
+];
+
+export const updateNoteValidation = [
+  query('id').trim().isMongoId().withMessage('Invalid note id'),
+  body('title').trim().optional().escape(),
+  body('content').trim().optional().escape(),
 ];
 
 export const validator = (req, res, next) => {
