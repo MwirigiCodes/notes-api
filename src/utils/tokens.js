@@ -20,7 +20,7 @@ export const generateTokens = (res, user) => {
     maxAge: 15 * 60 * 1000, // 15 minutes
   });
 
-  res.cookie('refreshToken', accessToken, {
+  res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     sameSite: 'strict',
     secure: process.env.NODE_ENV === 'production',
